@@ -1,2 +1,2 @@
 # IS345_Fall2023
-This repo contains all lab works for Web app development2 course
+This repo contains all lab works for the course of Web app development2
