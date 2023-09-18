@@ -4,20 +4,29 @@
 	<title>JavaScript</title>
 </head>
 <body>
-	<h1>This example shows how to let, const, and var are different in terms of redeclaration, block scope, and value change</h1>
+	<h1>This example shows how to use loops</h1>
 	<p id="id1"> The content of this paragraph will be changed when the page is loaded</p>
 	<p id="id2"> The content of this paragraph will be changed when the page is loaded</p>
 
 
 <script type="text/javascript">
-	{
-		x1 = 9;
-		const x2 = 8;
+	function a(s,e){
+		for(i=s;i<=e;i++)
+			console.log(i);
 	}
-	document.getElementById('id1').innerHTML=x1;
-	document.getElementById('id2').innerHTML=x2;
-	
+	a(5,10);
 
+	b=function(s,e){
+		for(i=s;i<=e;i++)
+			console.log(i);
+	}
+
+	b(5,10);
+
+
+	c=(s,e)=> {for(i=s;i<=e;i++) console.log(i);}
+
+	c(5,10);
 </script>
 
 </body>
