@@ -6,6 +6,7 @@
   <!-- Required meta tags  -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
 
 <!-- Bootstrap CSS -->
@@ -15,17 +16,19 @@
   
 </head>
 <body>
+
   <div align="center">
     Students
 </div>    
 
-  
+<h1 style="font-size:10vw">Hello World</h1>
   
 <br>
   <table class="table table-striped" style="width:70%;margin-left: 15%;margin-right:15%;">
 <thead>
   <tr>
     <th scope="col">#</th>
+    <th scope="col">Name</th>
     <th scope="col">Email</th>
     <th>delete</th>
   </tr>
@@ -35,7 +38,8 @@
  
   for(var i = 0; i< data.length; i++) {%>  
   <tr>
-    <th scope="row"><%= (i+1) %></th>
+    <td scope="row"><%= (i+1) %></td>
+    <td><%= data[i].name %></td>
     <td><a href="/user/<%=data[i].email%>"> <%= data[i].email%></a></td>
     
     <td><a href="/delete/<%=data[i].email%>" data-method="delete">Delete</a></td>
@@ -51,10 +55,12 @@
 </tbody>
 </table>
 
+
+
 <a href="/register">Add a new student</a>
 
 
-
+<img src="img_girl.jpg" style="max-width:100%;height:auto;">
 
 
 <!-- jQuery first, then Popper.js, then Bootstrap JS. -->

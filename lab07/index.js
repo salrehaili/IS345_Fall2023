@@ -11,11 +11,19 @@ app.use(express.urlencoded({extended: true}));
 
 
 app.get('/', (req, res) => {
-        res.send('Hello World!')
+        // res.send('Hello World!');
+        res.send(req.session);
 })
 
 app.get('/IS345', (req, res) => {
-    res.send('Welcome to Web Application Development 2')
+    res.type('text/plain')
+
+        res.send('Welcome to Web Application Development 2<br> ss')
+//     res.json({abc:3});
+// res.type('text/plain')
+// const headers = Object.entries(req.headers)
+//     .map(([key, value]) => `${key}: ${value}`)
+//   res.send(headers.join('\n'))
 })
 
 app.post('/', (req, res)=>{
@@ -34,6 +42,9 @@ app.post('/add', (req, res) => {
         res.send("id is "+ req.body.id + "<br>  user name is "+ req.body.name);
 })
 
+app.get('/add', (req, res) => {
+        res.send("id is "+ req.query.id + "<br>  user name is "+ req.query.name);
+})
 
 app.listen(3000 , () => {
 console.log('Server listening on port 3000');

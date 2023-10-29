@@ -10,29 +10,21 @@
 </head>
 
 <body>
+  <div class="row justify-content-md-center" style="margin-top: 40px">
     <header>
-      <h1>Student</h1>
+      <h1>Users</h1>
     </header>
-    <form action="http://localhost:3000/add" method="POST">
+    <form action="http://localhost:3000/register" method="POST">
       <fieldset>
-        <h3>Add new Student</h3>
-        <label for="sid">Student ID</label>
-        <input type ="text" name="sid" required>
+        <h3>Add new User</h3>
+        <label for="email">Email</label>
+        <input type ="email" name="email" required>
         <br><br>
-        <label for="fname">First Name</label>
-        <input type ="text" name="fname" required>
-        <br><br>
-        <label for="lname">Last Name</label>
-        <input type ="text" name="lname" required>
-        <br><br>
-        <label for="age">Age</label>
-        <input type ="text" name="age" required>
-        <br><br>
-        <label for="GPA">GPA</label>
-        <input type="text" name="GPA" required>
-        <br><br>
+        <label for="pass">Password</label>
+        <input type ="password" name="pass" required>
         <button class="btn btn-primary" type ="reset">Reset</button>
         <button class="btn btn-primary" type ="submit">Submit</button>
       </fieldset>
     </form>
+    </div>
 </body>

@@ -1,2 +1,3 @@
-import people from './people.js';
-console.log(people);
+import {cars} from './people.js';
+
+console.log(cars.age);

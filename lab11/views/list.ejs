@@ -26,11 +26,7 @@
 <thead>
   <tr>
     <th scope="col">#</th>
-    <th scope="col">sid</th>
-    <th scope="col">First Name</th>
-    <th scope="col">Last Name</th>
-    <th scope="col">age</th>
-    <th scope="col">GPA</th>
+    <th scope="col">Email</th>
     <th>delete</th>
   </tr>
 </thead>
@@ -40,12 +36,9 @@
   for(var i = 0; i< data.length; i++) {%>  
   <tr>
     <th scope="row"><%= (i+1) %></th>
-    <td><%= data[i].sid%></td>
-    <td><a href="/student/<%=data[i].sid%>"> <%= data[i].fname%></a></td>
-    <td><%= data[i].lname%></td>
-    <td><%= data[i].age%></td>
-    <td><%= data[i].GPA%></td>
-    <td><a href="/delete/<%=data[i].sid%>">Delete</a></td>
+    <td><a href="/user/<%=data[i].email%>"> <%= data[i].email%></a></td>
+    
+    <td><a href="/delete/<%=data[i].email%>" data-method="delete">Delete</a></td>
   </tr>
   <% }
            
@@ -58,7 +51,7 @@
 </tbody>
 </table>
 
-<a href="/userForm">Add a new student</a>
+<a href="/register">Add a new student</a>
 
 
 
