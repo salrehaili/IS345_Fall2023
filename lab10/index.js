@@ -1,14 +1,11 @@
 import express from 'express';
 import Sequelize from 'sequelize';
-// import helmet from 'helmet';
 
 const app = express();
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({extended: true}));
 app.use(express.static('public'));
 
-// enabling the Helmet middleware
-// app.use(helmet())
 ////////////////////////////////////////////////// Connection///////////////////////////////////////////////////////////////////
 const db  = {};
 
