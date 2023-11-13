@@ -10,8 +10,8 @@ import fs from 'fs';
 const app = express()
 
 // parse incoming POST request data with middleware
-// app.use(express.urlencoded({extended: true}));
-app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+// app.use(express.json());
 app.use(cookieParser())
 
 const mid1 =(req, res, next)=>{
@@ -26,7 +26,9 @@ const mid2 =(req, res, next)=>{
 
 const mid3 = (err, req, res, next) => {
         // Handle the error
+        // if (!err) return next();
         console.log('middleware3');
+        next()
         // res.status(500).json({ error: 'Internal Server Error' });
       
 
@@ -44,6 +46,8 @@ const mid3 = (err, req, res, next) => {
 app.get('/', (req, res) => {
         // res.cookie('hello', 'this is the value')
         res.send(req.cookies);
+        var err =  new Error('Something broke1!');
+        throw err;
 
         // if ( req.cookies.known === undefined ){
         //         res.cookie('known', '1')
@@ -55,20 +59,20 @@ app.get('/', (req, res) => {
         // res.send('<h1>Hello World!</h1>')
 })
 
-app.use((err, req, res, next)=> {
-        console.log('Welcome ... ')
-});
+// app.use((err, req, res, next)=> {
+//         console.log('Welcome ... ')
+//         next()
+// });
 
-app.use('/IS345', mid1);
-app.use('/IS345', mid2);
-app.use('/IS345', mid3);
+                
 
-app.get('/IS345', (req, res, next) => {
-        // // try{
-                var err =  new Error('Something broke!');
-                next(err);
+
+app.get('/IS345', (req, res) => {
+        // try{
+                var err =  new Error('Something broke2!');
+                throw err;
         // } catch(err){
-        //         next();
+                // next(err);
         // }
         
         // res.send('gg')
@@ -81,6 +85,9 @@ app.get('/IS345', (req, res, next) => {
 });
 
 
+app.use('/IS345', mid1);
+app.use('/IS345', mid2);
+app.use('/IS345', mid3);
 
 app.post('/', (req, res)=>{
         res.send('Got a POST request');
@@ -99,11 +106,17 @@ app.get('/user/:userId/book/:bookId', (req, res) => {
 })
 
 app.post('/add', (req, res) => {
-        res.setHeader('content-type', 'text/plain');
-        if(!req.body.msg){
-                res.status(400).send('msg is required!')
+        // res.send(Object.entries(req.body));
+        for (const [key, value] of Object.entries(req.body)) {
+                res.write("<p>"+key+" : "+value+"</p>");
         }
-        res.send("id is "+ req.body.id + "<br>  user name is "+ req.body.name).status(201);
+        res.end();
+
+        // res.setHeader('content-type', 'text/plain');
+        // if(!req.body.msg){
+        //         res.status(400).send('msg is required!')
+        // }
+        // res.send("id is "+ req.body.id + "<br>  user name is "+ req.body.name).status(201);
 });
 
 function middleware1(req, res, next){

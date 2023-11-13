@@ -1,0 +1,63 @@
+<%- include('header'); -%>
+
+
+
+
+  <div class="main">
+    <h2>Users</h2>
+    <p>The following table shows the registered users in this system, you can add a user by clicking on the plus button. For updating and deleteing use the icons beside each record.</p>
+
+    <div class="table-responsive-sm">
+      <table class="table table-striped" width="100%">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">operation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if(data.length){
+         
+          for(var i = 0; i< data.length; i++) {%>  
+          <tr>
+            <td scope="row"><%=data[i].id%></td>
+            <td><a href="/users/<%=data[i].id%>"><%= data[i].firstName %></a></td>
+
+            <td><%= data[i].email%></td>
+            
+            <td>
+              <a href="/update/<%=data[i].id%>" data-method="delete"><i class="fa fa-edit" aria-hidden="true"></i></a>
+              <a href="/delete/<%=data[i].id%>" data-method="delete"><i class="fa fa-trash" aria-hidden="true"></i></a>
+            </td>
+          </tr>
+          <% }
+                   
+           }else{ %>
+               <tr>
+                  <td colspan="3">No user</td>
+               </tr>
+            <% } %>    
+          
+        </tbody>
+        </table>
+      </div>
+
+
+
+
+
+
+
+
+
+
+        <a href="/register"><i class="fa fa-plus" aria-hidden="true"></i></a>
+
+  </div>
+
+  
+
+
+<%- include('footer'); -%>

@@ -1,51 +1,67 @@
 import express from 'express';
 import Sequelize from 'sequelize';
-import helmet from 'helmet';
+// import helmet from 'helmet';
 
 const app = express();
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({extended: true}));
 // enabling the Helmet middleware
-app.use(helmet())
+// app.use(helmet())
 ////////////////////////////////////////////////// Connection///////////////////////////////////////////////////////////////////
+const db  = {};
 
-const dbconnection = new Sequelize({
+const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: './lab09.db'
-  });
+    storage: './lab10.db',
+    logging: false
+});
+
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
 
 
-  // const dbconnection = new Sequelize('./employees.db', '', '', {
-  //   host: '',
-  //   dialect: 'sqlite'
-  // });
+
+
 ////////////////////////////////////////////////// Connection///////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////// Model///////////////////////////////////////////////////////////////////
 const userSchema ={
-  // Model attributes are defined here
-  name: {
-    type: Sequelize.DataTypes.TEXT,
-    allowNull: false,
-    unique: true
-    // validate: {
-    //   is: /^[0-9a-f]{64}$/i
-    // }
-
-  },
-  email: {
-    type: Sequelize.DataTypes.TEXT
-    // allowNull defaults to true
-  },
-  password: {
-      type: Sequelize.DataTypes.TEXT
-      // allowNull defaults to true
+    // Model attributes are defined here
+    id:{
+      type: db.Sequelize.DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    firstName: {
+      type: db.Sequelize.DataTypes.TEXT,
+      allowNull: { 
+        args: false,
+         msg: 'First Name is required' 
+      }
+    },
+    lastName: {
+      type: db.Sequelize.DataTypes.TEXT,
+      allowNull: false,
+    },
+    email: {
+      type: db.Sequelize.DataTypes.TEXT,
+      allowNull: false,
+      unique: {
+        args: true,
+        msg: 'Email address already in use!'
+      }
+    },
+    password: {
+      type: db.Sequelize.DataTypes.TEXT,
+      allowNull: false
     }
- }
+}
 
-const User = dbconnection.define('User', userSchema, {timestamps: false, freezeTableName: true});
-  
+const User = db.sequelize.define('users', userSchema, {timestamps: true, freezeTableName: true});
+
+sequelize.sync();
+
   // `sequelize.define` also returns the model
 //   console.log(User === sequelize.models.User); // true
 ////////////////////////////////////////////////// Model///////////////////////////////////////////////////////////////////
@@ -54,8 +70,7 @@ const User = dbconnection.define('User', userSchema, {timestamps: false, freezeT
 app.get('/users', (req, res) => {
     User.findAll()
     .then((result)=>{
-        // res.send(result);
-    res.render("list2", {
+    res.render("users", {
             data:result
     })
     })
@@ -83,31 +98,25 @@ app.post('/add', (req, res) => {
     // }
     ).save()
           .then((result) =>{
-              res.send(result)
+              res.redirect('/users');
           })
           .catch((err)=>{
-              console.log(err);
-          });
-
-          res.redirect('/users')
+              res.render("register", {success: false, data: req.body, msg: err.message})
+          });            
 })
 
-app.put('/update/:id', (req, res)=> {
+app.post('/update/:id', (req, res)=> {
   User.update(req.body,
     {where: {id: req.params.id}}
   )
   .then((result)=> {
-    res.json(result)
+    res.redirect('/users');
   })
   .catch((err)=>{
-    console.log(err);
+    req.body.id=req.params.id;
+    res.render("update", {success: false, data: req.body, msg: err.message})
   })
 })
-
-app.get('/register', (req, res)=>{
-  res.render("register");
-})
-
 
 app.get('/delete/:id', (req, res)=>{
   User.destroy({ where: {id: req.params.id} })
@@ -116,7 +125,27 @@ app.get('/delete/:id', (req, res)=>{
       });
 })
 
+app.get('/update/:id', (req, res)=>{
+  User.findOne({where: {id: req.params.id}})
+    .then((result)=>{
+      res.render('update',{success: true, data:result});
+    })
+    .catch((err)=>{
+        console.log(err.message);
+    })
+
+ 
+})
+
+app.get('/register', (req, res)=>{
+  res.render("register", {success: true, data:{}});
+})
+
+
+
+
 
 app.listen(3000 || PORT, () => {
     console.log(`Online compiler Server listening on port 3000`);
 });
+

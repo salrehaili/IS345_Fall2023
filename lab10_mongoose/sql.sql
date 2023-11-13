@@ -1,0 +1,27 @@
+
+create table users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  password TEXT,
+  createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL UNIQUE,
+  email TEXT,
+  password TEXT,
+  createdAt DATETIME NOT NULL,
+  updatedAt DATETIME NOT NULL
+  );
+
+
+CREATE TABLE issue (
+  issue_id TEXT PRIMARY KEY NOT NULL,
+  short_description TEXT NOT NULL,
+  device TEXT NOT NULL,
+  display BOOLEAN DEFAULT 1 NOT NULL
+);
