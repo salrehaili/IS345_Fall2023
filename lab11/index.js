@@ -1,188 +1,161 @@
 import express from 'express';
-import mongoose from 'mongoose';
-import session from 'express-session';
+import { Sequelize, DataTypes } from 'sequelize';
 
 
-
-const app = express()
-
-app.use(session({ secret: "Your secret key" }));
-
+const app = express();
 app.set('view engine', 'ejs');
-
-// parse incoming POST request data with middleware
 app.use(express.urlencoded({extended: true}));
-// app.use(express.json());
-
-
 ////////////////////////////////////////////////// Connection///////////////////////////////////////////////////////////////////
 
-const dbURI = 'mongodb://sameer:mlid334430@localhost:27017/?retryWrites=true&w=majority';
-
-// const start =async ()=>{
-        await mongoose.connect(dbURI, 
-        {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        })
-        .then((result)=> {
-            console.log('Connected to db')
-            app.listen(3000 || PORT, () => {
-                console.log(`Online compiler Server listening on port 3000`);
-            });
-        })
-        .catch((err)=> console.log("There is a problem with db"));
-//     }
-    
-//     start();
-////////////////////////////////////////////////// Connection///////////////////////////////////////////////////////////////////
-
-
-
-////////////////////////////////////////////////// Model///////////////////////////////////////////////////////////////////
-const Schema = mongoose.Schema;
-//make a schema which defines the structure
-const userSchema = new Schema({
-	email: {
-		type: String,
-		required: [true, "Provide an email"],
-                unique: [true, "Email exists!"],
-	},
-        password: {
-		type: String,
-		required: true
-	}
-}, {timestamps: true});
-
-//define a model based on the above schema
-const User = mongoose.model('User', userSchema);
-////////////////////////////////////////////////// Model///////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-//////////////////////////////////////////////////Routes//////////////////////////////////////////////////////////////////
-// GET /
-// GET /login
-// POST /login
-// GET /users
-// GET /user/:email
-// GET /delete/:email
-// GET /register        render the registration template
-// POST /register       Receives the registration form
-
-app.get('/login', (req, res) => {
-        res.render('login')
-      })
-
-app.post('/login', (req, res) => {
-        if(req.body.email == "salrehaili@gmail.com" && req.body.pass == "982")
-        {
-                req.session.user ="admin3";
-                res.redirect("/control");
-                // res.redirect('back');
-        }
-        else
-        {
-                res.send("username or password is incorrect");
-        }
-      })
-
-app.get('/users', checkLogin, (req, res) => {
-        User.find()
-        .then((result)=>{
-        //     res.send(result);
-        res.render("list", {
-                data:result
-        })
-        })
-        .catch((err)=>{
-            console.log(err);
-        })
-})
-
-app.get('/user/:email',(req, res) => {
-        User.findOne({email: req.params.email})
-        .then((result)=>{
-                const msg = `<pre>
-                <b>email</b> is ${result.email}
-                </pre>`;
-                res.send(msg);
-        })
-        .catch((err)=>{
-                console.log(err);
-        })
+const connection = new Sequelize({
+    dialect: 'sqlite',
+    storage: './lab11.db',
+    logging: false
 });
 
-app.get('/delete/:email', (req, res)=>{
-        User.deleteOne({ email: req.params.email })
-        .then((result) => {
-                res.redirect('/users')
-            });
-})
 
-app.get('/register', (req, res)=>{
-        res.render("register");
-})
+////////////////////////////////////////////////// Connection///////////////////////////////////////////////////////////////////
 
 
+// check database connection
+connection.authenticate().then(()=> {
+  console.log("Successfully we are connected with the database");
+}).catch(function (error) {
+  console.log(error);
+});
 
-app.post('/register', (req, res) => {
-        // res.send("id is "+ req.body.id + "<br>  user name is "+ req.body.name);
-        const user = new User({
-                email: req.body.email,
-                password: req.body.pass
-            });
-
-            user.save()
-                .then((result) =>{
-                    res.send(result)
-                })
-                .catch((err)=>{
-                    console.log(err);
-                });
-
-                res.redirect('/users')
-})
+////////////////////////////////////////////////// Model///////////////////////////////////////////////////////////////////
 
 
+const deptSchema ={
+  id:{
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  name: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  }
+}
+const Dept = connection.define('dept', deptSchema, {timestamps: false, freezeTableName: true});
 
-// app.listen(3000 , () => {
-// console.log('Server listening on port 3000');
-// });
 
-
-function checkLogin(req, res, next){
-        if(req.session.user){
-                next();
-        }
-        else{
-                res.redirect('/login');
-        }
+const empSchema ={
+  id:{
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  name: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  dept_id: {
+    type: DataTypes.INTEGER,
+  },
+  manager: {
+    type: DataTypes.INTEGER,
+  },
 }
 
+const Emp = connection.define('emp', empSchema, {timestamps: false, freezeTableName: true});
+Emp.belongsTo(Emp, { foreignKey: 'manager'}); 
+Emp.belongsTo(Dept, { foreignKey: 'dept_id'}); 
 
 
-      
-app.get('/control', checkLogin, (req, res) => {
-        res.send('welcome to control')      
+connection.sync();
+
+  // `sequelize.define` also returns the model
+//   console.log(User === sequelize.models.User); // true
+////////////////////////////////////////////////// Model///////////////////////////////////////////////////////////////////
+
+app.get('/', (req, res) => {
+  res.send('welcome');
+})
+app.get('/emp', (req, res) => {
+  Emp.findAll()
+    .then((result)=>{
+    res.render('emp', {data:result});
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
 })
 
-const middlewareFunction = (req, res, next)=> {
-        console.log('We are in middleware');
-        next();
-      };
+app.get('/add_emp', (req, res)=>{
+  res.render('add_emp');
+})
 
-app.use(middlewareFunction);
+app.post('/add_emp', (req, res)=>{
+  Emp.build(req.body)
+      .save()
+          .then((result) =>{
+              res.send('Done');
+          })
+          .catch((err)=>{
+              res.send(err);
+          });  
+})
 
 
 
+app.get('/add_dept', (req, res)=>{
+  Dept.build({id:1, name: 'Marketing'})
+      .save()
+          .then((result) =>{
+              res.send('Done');
+          })
+          .catch((err)=>{
+              res.send(err);
+          });  
+})
 
-//////////////////////////////////////////////////Routes//////////////////////////////////////////////////////////////////
+
+app.get('/dept', (req, res) => {
+  Dept.findAll()
+    .then((result)=>{
+    res.send(result);
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
+})
+
+app.get('/employees/:id', (req, res)=>{
+  Emp.findOne({where: {id: req.params.id}})
+    .then((result)=>{
+        res.send(result);
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
+});
 
 
 
+// app.post('/updateuser/:id', (req, res)=> {
+//   User.update(req.body,
+//     {where: {id: req.params.id}}
+//   )
+//   .then((result)=> {
+//     res.redirect('/users');
+//   })
+//   .catch((err)=>{
+//     req.body.id=req.params.id;
+//     res.render("updateuser", {success: false, data: req.body, msg: err.message})
+//   })
+// })
 
-//       https://medium.com/@sarthakmittal1461/to-build-login-sign-up-and-logout-restful-apis-with-node-js-using-jwt-authentication-f3d7287acca2
+app.get('/delete_emp/:id', (req, res)=>{
+  Emp.destroy({ where: {id: req.params.id} })
+  .then((result) => {
+          res.send('Delete Done');
+      });
+})
+
+
+
+app.listen(3000 || PORT, () => {
+    console.log(`Online compiler Server listening on port 3000`);
+});

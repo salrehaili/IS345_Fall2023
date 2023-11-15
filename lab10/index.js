@@ -1,5 +1,7 @@
 import express from 'express';
-import Sequelize from 'sequelize';
+// import Sequelize from 'sequelize';
+import { Sequelize, DataTypes } from 'sequelize';
+
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -7,44 +9,45 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.static('public'));
 
 ////////////////////////////////////////////////// Connection///////////////////////////////////////////////////////////////////
-const db  = {};
 
-const sequelize = new Sequelize({
+const connection = new Sequelize({
     dialect: 'sqlite',
     storage: './lab10.db',
     logging: false
 });
 
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
-
-
-
 
 ////////////////////////////////////////////////// Connection///////////////////////////////////////////////////////////////////
 
+
+// check database connection
+connection.authenticate().then(()=> {
+  console.log("Successfully we are connected with the database");
+}).catch(function (error) {
+  console.log(error);
+});
 
 ////////////////////////////////////////////////// Model///////////////////////////////////////////////////////////////////
 const userSchema ={
     // Model attributes are defined here
     id:{
-      type: db.Sequelize.DataTypes.INTEGER,
+      type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
     firstName: {
-      type: db.Sequelize.DataTypes.TEXT,
+      type: DataTypes.TEXT,
       allowNull: { 
         args: false,
          msg: 'First Name is required' 
       }
     },
     lastName: {
-      type: db.Sequelize.DataTypes.TEXT,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     email: {
-      type: db.Sequelize.DataTypes.TEXT,
+      type: DataTypes.TEXT,
       allowNull: false,
       unique: {
         args: true,
@@ -52,14 +55,14 @@ const userSchema ={
       }
     },
     password: {
-      type: db.Sequelize.DataTypes.TEXT,
+      type: DataTypes.TEXT,
       allowNull: false
     }
 }
 
-const User = db.sequelize.define('users', userSchema, {timestamps: true, freezeTableName: true});
+const User = connection.define('users', userSchema, {timestamps: true, freezeTableName: true});
 
-sequelize.sync();
+connection.sync();
 
   // `sequelize.define` also returns the model
 //   console.log(User === sequelize.models.User); // true
@@ -133,12 +136,6 @@ app.get('/deleteuser/:id', (req, res)=>{
           res.redirect('/users')
       });
 })
-
-
-
-
-
-
 
 
 
