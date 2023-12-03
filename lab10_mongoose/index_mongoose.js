@@ -94,7 +94,7 @@ app.get('/users', checkLogin, (req, res) => {
         User.find()
         .then((result)=>{
         //     res.send(result);
-        res.render("list", {
+        res.render("users", {
                 data:result
         })
         })
