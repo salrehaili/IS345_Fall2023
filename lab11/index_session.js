@@ -34,7 +34,7 @@ app.use((req, res, next)=> {
 
 const checklogin = (req, res, next)=>{
   if(req.session.loggedin==null){
-      res.render('login');
+      res.redirect('/login');
   } else {
       next();
   }
@@ -169,8 +169,10 @@ app.get('/login', (req, res)=>{
 app.post('/login', (req, res)=>{
   User.findOne({where: {email: req.body.email, password: req.body.pass}})
   .then((result)=>{
+    if(result){
       req.session.loggedin=true;
       req.session.username = result.firstName;
+    }
 
       res.redirect('/');
   })

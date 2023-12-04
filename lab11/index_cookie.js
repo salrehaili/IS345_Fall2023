@@ -14,34 +14,33 @@ app.use(cookieParser())
 
 
 
-app.use(session({ 
-  secret: 'Secret333',
-  name: 'lab11', // Customise the name to 'test'
-  resave: false,  // don't save session if unmodified
-  saveUninitialized: false,  // don't create session until something stored
-  cookie: { 
-    maxAge: 1000 * 60 * 1 * 1,  // 1 minute
-  }
-}));
+// app.use(session({ 
+//   secret: 'Secret333',
+//   name: 'lab11', // Customise the name to 'test'
+//   resave: false,  // don't save session if unmodified
+//   saveUninitialized: false,  // don't create session until something stored
+//   cookie: { 
+//     maxAge: 1000 * 60 * 1 * 1,  // 1 minute
+//   }
+// }));
 
 
 
-// app.use((req, res, next)=> {
-//   res.locals.loggedin = req.session.loggedin;
-//   res.locals.username = req.session.username;  
-//   next();
-// });
+app.use((req, res, next)=> {
+  res.locals.loggedin = req.cookies.loggedin;
+  res.locals.username = req.cookies.username;  
+  next();
+});
 
 
 
 const checklogin = (req, res, next)=>{
-    console.log("session = "+ res.session );
-    console.log("cookie = "+ res.cookie );
-//   if(req.session.loggedin==null){
-//       res.render('login');
-//   } else {
+    
+  if(!req.cookies.loggedin){
+      res.redirect('/login');
+  } else {
       next();
-//   }
+  }
 }
 
 ////////////////////////////////////////////////// Connection///////////////////////////////////////////////////////////////////
@@ -97,18 +96,11 @@ connection.sync();
 //   console.log(User === sequelize.models.User); // true
 ////////////////////////////////////////////////// Model///////////////////////////////////////////////////////////////////
 
-app.get('/', (req, res) => {
-    // res.send(req.session );
-    res.send(req.cookies.cookie_011);
-  //res.render('main');
+app.get('/',checklogin, (req, res) => {
+  res.render('main');
 })
 
-app.get('/set', (req, res)=>{
-    res.cookie('cookie_011' , 'Hi dd').send('Cookie is set');  
-    
-        
 
-})
 app.get('/users',checklogin, (req, res) => {
     User.findAll()
     .then((result)=>{
@@ -181,20 +173,23 @@ app.get('/login', (req, res)=>{
 app.post('/login', (req, res)=>{
   User.findOne({where: {email: req.body.email, password: req.body.pass}})
   .then((result)=>{
-      req.session.loggedin=true;
-      req.session.username = result.firstName;
-
+    if(result)
+    {
+      res.cookie('loggedin', true);
+      res.cookie('username', result.firstName, {maxAge: 2*60*1000});
+    }
       res.redirect('/');
   })
   .catch((err)=>{
-      // console.log(err);
       res.render('login', {success: false, data: req.body, msg: err.message});
   })
 })
 
 app.get('/logout',checklogin ,(req, res)=>{
-  req.session.destroy();
+  res.clearCookie('loggedin');
+  res.clearCookie('username');
   res.redirect('/');
+  
 })
 
 
