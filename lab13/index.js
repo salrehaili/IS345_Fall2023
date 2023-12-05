@@ -1,58 +1,148 @@
 import express from 'express';
-import cookieParser from'cookie-parser';
-import session from 'express-session';
-
-//Routing
+import { Sequelize, DataTypes } from 'sequelize';
 
 
-const app = express()
+const app = express();
+app.set('view engine', 'ejs');
+app.use(express.urlencoded({extended: true}));
+////////////////////////////////////////////////// Connection///////////////////////////////////////////////////////////////////
 
-// // parse incoming POST request data with middleware
-// app.use(express.urlencoded({extended: true}));
-// // app.use(express.json());
-
-
-// app.get('/', (req, res) => {
-//         res.send('Hello World!')
-// })
-
-// app.get('/IS345', (req, res) => {
-//     res.send('Welcome to Web Application Development 2')
-// })
-
-// app.post('/', (req, res)=>{
-//         res.send('Got a POST request');
-// })
-
-// app.get('/student/:id', (req, res) => {
-//         res.send('details of student '+req.params.id)
-// })
-      
-// app.get('/user/:userId/book/:bookId', (req, res) => {
-//         res.send("userid is "+ req.params.userId+" <br> bookid is "+req.params.bookId)
-// })
-
-// app.post('/add', (req, res) => {
-//         res.send("id is "+ req.body.id + "<br>  user name is "+ req.body.name);
-// })
-
-app.use(cookieParser());
-app.use(session({secret: "Shh, its a secret!"}));
-
-
-app.get('/', function(req, res){
-        if(req.session.page_views){
-           req.session.page_views++;
-           res.send("You visited this page " + req.session.page_views + " times");
-        } 
-        else{
-           req.session.page_views = 1;
-           res.send("Welcome to this page for the first time!");
-        }
+const connection = new Sequelize({
+    dialect: 'sqlite',
+    storage: './lab11.db',
+    logging: false
 });
 
 
-app.listen(3000 , () => {
-console.log('Server listening on port 3000');
+const deptSchema ={
+  id:{
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  name: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  }
+}
+const Dept = connection.define('dept', deptSchema, {timestamps: false, freezeTableName: true});
+
+
+const empSchema ={
+  id:{
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  name: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  dept_id: {
+    type: DataTypes.INTEGER,
+  },
+  manager: {
+    type: DataTypes.INTEGER,
+  },
+}
+
+const Emp = connection.define('emp', empSchema, {timestamps: false, freezeTableName: true});
+Emp.belongsTo(Emp, { foreignKey: 'manager'}); 
+Emp.belongsTo(Dept, { foreignKey: 'dept_id'}); 
+
+
+connection.sync();
+
+  // `sequelize.define` also returns the model
+//   console.log(User === sequelize.models.User); // true
+////////////////////////////////////////////////// Model///////////////////////////////////////////////////////////////////
+
+app.get('/', (req, res) => {
+  res.send('welcome');
+})
+app.get('/emp', (req, res) => {
+  Emp.findAll()
+    .then((result)=>{
+    res.render('emp', {data:result});
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
+})
+
+app.get('/add_emp', (req, res)=>{
+  res.render('add_emp');
+})
+
+app.post('/add_emp', (req, res)=>{
+  Emp.build(req.body)
+      .save()
+          .then((result) =>{
+              res.send('Done');
+          })
+          .catch((err)=>{
+              res.send(err);
+          });  
+})
+
+
+
+app.get('/add_dept', (req, res)=>{
+  Dept.build({id:1, name: 'Marketing'})
+      .save()
+          .then((result) =>{
+              res.send('Done');
+          })
+          .catch((err)=>{
+              res.send(err);
+          });  
+})
+
+
+app.get('/dept', (req, res) => {
+  Dept.findAll()
+    .then((result)=>{
+    res.send(result);
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
+})
+
+app.get('/employees/:id', (req, res)=>{
+  Emp.findOne({where: {id: req.params.id}})
+    .then((result)=>{
+        res.send(result);
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
 });
 
+
+
+// app.post('/updateuser/:id', (req, res)=> {
+//   User.update(req.body,
+//     {where: {id: req.params.id}}
+//   )
+//   .then((result)=> {
+//     res.redirect('/users');
+//   })
+//   .catch((err)=>{
+//     req.body.id=req.params.id;
+//     res.render("updateuser", {success: false, data: req.body, msg: err.message})
+//   })
+// })
+
+app.get('/delete_emp/:id', (req, res)=>{
+  Emp.destroy({ where: {id: req.params.id} })
+  .then((result) => {
+          res.send('Delete Done');
+      });
+})
+
+
+
+app.listen(3000 || PORT, () => {
+    console.log(`Online compiler Server listening on port 3000`);
+});

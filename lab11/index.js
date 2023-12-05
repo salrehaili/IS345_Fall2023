@@ -14,6 +14,19 @@ const connection = new Sequelize({
 });
 
 
+////////////////////////////////////////////////// Connection///////////////////////////////////////////////////////////////////
+
+
+// check database connection
+connection.authenticate().then(()=> {
+  console.log("Successfully we are connected with the database");
+}).catch(function (error) {
+  console.log(error);
+});
+
+////////////////////////////////////////////////// Model///////////////////////////////////////////////////////////////////
+
+
 const deptSchema ={
   id:{
     type: DataTypes.INTEGER,
@@ -120,19 +133,33 @@ app.get('/employees/:id', (req, res)=>{
 });
 
 
+app.get('/update_emp/:id', (req, res)=> {
+  Emp.findOne({where: {id: req.params.id}})
+    .then((result)=>{
+      let data={
+        id:req.params.id
+      }
+      res.render('update_emp', {success: false, data: result, msg: '' });
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
+  
+}
+);
 
-// app.post('/updateuser/:id', (req, res)=> {
-//   User.update(req.body,
-//     {where: {id: req.params.id}}
-//   )
-//   .then((result)=> {
-//     res.redirect('/users');
-//   })
-//   .catch((err)=>{
-//     req.body.id=req.params.id;
-//     res.render("updateuser", {success: false, data: req.body, msg: err.message})
-//   })
-// })
+app.post('/update_emp/:id', (req, res)=> {
+  Emp.update(req.body,
+    {where: {id: req.params.id}}
+  )
+  .then((result)=> {
+    res.redirect('/users');
+  })
+  .catch((err)=>{
+    req.body.id=req.params.id;
+    res.render("updateuser", {success: false, data: req.body, msg: err.message})
+  })
+})
 
 app.get('/delete_emp/:id', (req, res)=>{
   Emp.destroy({ where: {id: req.params.id} })

@@ -1,0 +1,42 @@
+      <table>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">dept_id</th>
+            <th scope="col">Manager</th>
+            <th>Operations</th>
+          </tr>
+      
+          <% if(data.length){
+         
+          for(var i = 0; i< data.length; i++) {%>  
+          <tr>
+            <td scope="row"><%=data[i].id%></td>
+            <td><a href="/users/<%=data[i].id%>"><%= data[i].name %></a></td>
+
+            <td><%= data[i].dept_id%></td>
+            <td><%= data[i].manager%></td>
+
+            
+            <td>
+              <a href="/update_emp/<%=data[i].id%>" >update</a>
+              <a href="/delete_emp/<%=data[i].id%>" >delete</a>
+            </td>
+          </tr>
+          <% }
+                   
+           }else{ %>
+               <tr>
+                  <td colspan="3">No emp</td>
+               </tr>
+            <% } %>    
+        </table>
+      </div>
+
+        <a href="/add_emp">ADD</a>
+
+  </div>
+
+  
+
+

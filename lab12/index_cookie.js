@@ -1,6 +1,7 @@
 import express from 'express';
 import { Sequelize, DataTypes } from 'sequelize';
 import session from 'express-session';
+import cookieParser from 'cookie-parser';
 
 
 const app = express();
@@ -8,31 +9,32 @@ app.set('view engine', 'ejs');
 app.use(express.static('public'));
 
 app.use(express.urlencoded({extended: true}));
+app.use(cookieParser())
 
 
 
-app.use(session({ 
-  secret: 'Secret333',
-  name: 'lab11', // Customise the name to 'test'
-  resave: false,  // don't save session if unmodified
-  saveUninitialized: false,  // don't create session until something stored
-  cookie: { 
-    maxAge: 1000 * 60 * 1 * 1,  // 1 minute
-  }
-}));
+// app.use(session({ 
+//   secret: 'Secret333',
+//   name: 'lab12', // Customise the name to 'test'
+//   resave: false,  // don't save session if unmodified
+//   saveUninitialized: false,  // don't create session until something stored
+//   cookie: { 
+//     maxAge: 1000 * 60 * 1 * 1,  // 1 minute
+//   }
+// }));
 
 
 
 app.use((req, res, next)=> {
-  res.locals.loggedin = req.session.loggedin;
-  res.locals.username = req.session.username;  
+  res.locals.loggedin = req.cookies.loggedin;
+  res.locals.username = req.cookies.username;  
   next();
 });
 
 
 
 const checklogin = (req, res, next)=>{
-  if(req.session.loggedin==null){
+  if(!req.cookies.loggedin){
       res.redirect('/login');
   } else {
       next();
@@ -43,7 +45,7 @@ const checklogin = (req, res, next)=>{
 
 const connection = new Sequelize({
     dialect: 'sqlite',
-    storage: './lab11.db',
+    storage: './lab12.db',
     logging: false
 });
 
@@ -95,6 +97,7 @@ connection.sync();
 app.get('/',checklogin, (req, res) => {
   res.render('main');
 })
+
 
 app.get('/users',checklogin, (req, res) => {
     User.findAll()
@@ -168,24 +171,23 @@ app.get('/login', (req, res)=>{
 app.post('/login', (req, res)=>{
   User.findOne({where: {email: req.body.email, password: req.body.pass}})
   .then((result)=>{
-    if(result){
-      req.session.loggedin=true;
-      req.session.username = result.firstName;
+    if(result)
+    {
+      res.cookie('loggedin', true);
+      res.cookie('username', result.firstName, {maxAge: 2*60*1000});
     }
-
       res.redirect('/');
   })
   .catch((err)=>{
-      // console.log(err);
       res.render('login', {success: false, data: req.body, msg: err.message});
   })
 })
 
 app.get('/logout',checklogin ,(req, res)=>{
-  req.session.destroy();
-  res.clearCookie('lab11') // clean up!
-
+  res.clearCookie('loggedin');
+  res.clearCookie('username');
   res.redirect('/');
+  
 })
 
 

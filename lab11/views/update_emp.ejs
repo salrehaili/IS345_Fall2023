@@ -1,0 +1,46 @@
+
+
+
+    
+      <div class="main">
+       
+        <div class="row justify-content-md-center" style="margin-top: 40px">
+    
+        </header>
+       
+        <form action="/update_emp/<%= data.id %>" method="POST">
+          <% if (success==false) {%>
+            <div class="alert alert-danger" role="alert">
+            <%=msg%>
+            </div>
+  
+          <% } %>
+
+
+            <label for="name"> Name</label>
+            <input type ="text" name="name"  value="<%= data.name%>" required>
+            <br><br>
+           
+            <label for="dept_id">Dept_id</label>
+            <input type ="text" name="dept_id" value="<%= data.dept_id %>" required>
+            <br><br>
+            <label for="manager">Manager</label>
+            <input type ="text" name="manager" value = "<%= data.manager %>" required>
+            <br><br>
+            
+
+            <button class="btn btn-primary" type ="reset">Reset</button>
+            <button class="btn btn-primary" type ="submit">Update</button>
+
+
+           
+
+        </form>
+        
+        </div>
+    
+      </div>
+    
+     
+    
+ 
