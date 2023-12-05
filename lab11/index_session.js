@@ -1,5 +1,4 @@
 import express from 'express';
-// import Sequelize from 'sequelize';
 import { Sequelize, DataTypes } from 'sequelize';
 import session from 'express-session';
 
@@ -184,6 +183,8 @@ app.post('/login', (req, res)=>{
 
 app.get('/logout',checklogin ,(req, res)=>{
   req.session.destroy();
+  res.clearCookie('lab11') // clean up!
+
   res.redirect('/');
 })
 

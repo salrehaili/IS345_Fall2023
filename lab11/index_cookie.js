@@ -1,5 +1,4 @@
 import express from 'express';
-// import Sequelize from 'sequelize';
 import { Sequelize, DataTypes } from 'sequelize';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
@@ -35,7 +34,6 @@ app.use((req, res, next)=> {
 
 
 const checklogin = (req, res, next)=>{
-    
   if(!req.cookies.loggedin){
       res.redirect('/login');
   } else {
