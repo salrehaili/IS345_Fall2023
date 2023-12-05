@@ -165,7 +165,7 @@ app.get('/deleteuser/:id',checklogin, (req, res)=>{
 })
 
 app.get('/login', (req, res)=>{
-  res.render('login');
+  res.render('login', {success: true, data:{}});
 });
 
 app.post('/login', (req, res)=>{
@@ -175,8 +175,11 @@ app.post('/login', (req, res)=>{
     {
       res.cookie('loggedin', true);
       res.cookie('username', result.firstName, {maxAge: 2*60*1000});
-    }
       res.redirect('/');
+    }else{
+      res.render('login', {success: false, data: req.body, msg: 'incorrect email or password'});
+    }
+
   })
   .catch((err)=>{
       res.render('login', {success: false, data: req.body, msg: err.message});

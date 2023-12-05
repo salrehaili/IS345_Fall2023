@@ -162,7 +162,7 @@ app.get('/deleteuser/:id',checklogin, (req, res)=>{
 })
 
 app.get('/login', (req, res)=>{
-  res.render('login');
+  res.render('login', {success: true, data:{}});
 });
 
 app.post('/login', (req, res)=>{
@@ -171,9 +171,11 @@ app.post('/login', (req, res)=>{
     if(result){
       req.session.loggedin=true;
       req.session.username = result.firstName;
-    }
-
       res.redirect('/');
+    }else{
+      res.render('login', {success: false, data: req.body, msg: 'incorrect email or password'});
+    }
+      
   })
   .catch((err)=>{
       // console.log(err);

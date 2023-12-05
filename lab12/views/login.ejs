@@ -18,12 +18,19 @@
   <div class="row justify-content-md-center" style="margin-top: 40px">
     <header>
       <h1>Student</h1>
+     
     </header>
     <form action="/login" method="POST">
+      <% if (success==false) {%>
+        <div class="alert alert-danger" role="alert">
+        <%=msg%>
+        </div>
+
+      <% } %>
       <fieldset>
         <h3>Add new Student</h3>
         <label for="email">Email</label>
-        <input type ="email" name="email" required>
+        <input type ="email" name="email" value="<%= data.email %>" required>
         <br><br>
         <label for="pass">Password</label>
         <input type ="password" name="pass" required>
